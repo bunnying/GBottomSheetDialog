@@ -1,4 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <public name="GBottomSheetDialogTheme" type="style"/>
+    <public name="GTheme_GBottomSheetDialogTheme" type="style"/>
 </resources>
