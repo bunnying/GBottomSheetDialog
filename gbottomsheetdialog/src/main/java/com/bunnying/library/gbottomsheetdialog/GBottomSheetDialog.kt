@@ -16,9 +16,11 @@ abstract class GBottomSheetDialog constructor(
     private val layoutHeight: Int = ViewGroup.LayoutParams.WRAP_CONTENT,
     @StyleRes style: Int = R.style.GTheme_GBottomSheetDialogTheme
 ) : BottomSheetDialog(context, style),
-    View.OnLayoutChangeListener, DialogInterface.OnDismissListener {
+    View.OnLayoutChangeListener, DialogInterface.OnShowListener, DialogInterface.OnDismissListener {
     constructor(context: Context, isMatchParent: Boolean, @StyleRes style: Int = R.style.GTheme_GBottomSheetDialogTheme)
             : this(context, if(isMatchParent) ViewGroup.LayoutParams.MATCH_PARENT else ViewGroup.LayoutParams.WRAP_CONTENT, style)
+
+    private var parent: View? = null
 
     init {
         window?.let { w ->
@@ -26,14 +28,12 @@ abstract class GBottomSheetDialog constructor(
             w.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
         }
     }
-
-    private var parent: View? = null
     override fun setContentView(layoutResId: Int) {
         this.setContentView(View.inflate(context, layoutResId, null))
     }
     override fun setContentView(view: View) {
         val v = View.inflate(context, R.layout.dialog_layout, null)
-        v.findViewById<BottomSheetLayout?>(R.id.layoutBottomSheetDialog)?.apply {
+        v.findViewById<BottomSheetLayout?>(android.R.id.content)?.apply {
             this.addView(view, RelativeLayout.LayoutParams.MATCH_PARENT, layoutHeight)
         }
         super.setContentView(v)
@@ -45,21 +45,24 @@ abstract class GBottomSheetDialog constructor(
             this.parent = parent
             parent.background = null
             parent.addOnLayoutChangeListener(this)
-            super.setOnDismissListener(this)
         }
+        super.setOnShowListener(this)
+        super.setOnDismissListener(this)
     }
 
-    private var dismissListener: DialogInterface.OnDismissListener? = null
-    override fun setOnDismissListener(listener: DialogInterface.OnDismissListener?) {
-        this.dismissListener = listener
+    @Deprecated("override onShow()")
+    override fun setOnShowListener(listener: DialogInterface.OnShowListener?) {}
+    @Deprecated("override onDismiss()")
+    override fun setOnDismissListener(listener: DialogInterface.OnDismissListener?) {}
+
+    override fun onShow(dialog: DialogInterface?) {
+        //
     }
     override fun onDismiss(dialog: DialogInterface?) {
         try {
             parent?.removeOnLayoutChangeListener(this)
         } catch (e: Exception) {
             //
-        } finally {
-            dismissListener?.onDismiss(dialog)
         }
     }
     override fun onLayoutChange(v: View?, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
