@@ -1,7 +1,6 @@
 package com.bunnying.library.gbottomsheetdialog
 
 import android.content.Context
-import android.content.DialogInterface
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
 import android.view.View
@@ -11,12 +10,13 @@ import androidx.annotation.StyleRes
 import com.google.android.material.bottomsheet.BottomSheetDialog
 import kotlin.math.abs
 
-abstract class GBottomSheetDialog constructor(
+open class GBottomSheetDialog constructor(
     context: Context,
     private val layoutHeight: Int = ViewGroup.LayoutParams.WRAP_CONTENT,
     @StyleRes style: Int = R.style.GTheme_GBottomSheetDialogTheme
 ) : BottomSheetDialog(context, style),
-    View.OnLayoutChangeListener, DialogInterface.OnShowListener, DialogInterface.OnDismissListener {
+    View.OnLayoutChangeListener {
+
     constructor(context: Context, isMatchParent: Boolean, @StyleRes style: Int = R.style.GTheme_GBottomSheetDialogTheme)
             : this(context, if(isMatchParent) ViewGroup.LayoutParams.MATCH_PARENT else ViewGroup.LayoutParams.WRAP_CONTENT, style)
 
@@ -46,25 +46,12 @@ abstract class GBottomSheetDialog constructor(
             parent.background = null
             parent.addOnLayoutChangeListener(this)
         }
-        super.setOnShowListener(this)
-        super.setOnDismissListener(this)
+    }
+    override fun dismiss() {
+        super.dismiss()
+        parent?.removeOnLayoutChangeListener(null)
     }
 
-    @Deprecated("override onShow()")
-    override fun setOnShowListener(listener: DialogInterface.OnShowListener?) {}
-    @Deprecated("override onDismiss()")
-    override fun setOnDismissListener(listener: DialogInterface.OnDismissListener?) {}
-
-    override fun onShow(dialog: DialogInterface?) {
-        //
-    }
-    override fun onDismiss(dialog: DialogInterface?) {
-        try {
-            parent?.removeOnLayoutChangeListener(this)
-        } catch (e: Exception) {
-            //
-        }
-    }
     override fun onLayoutChange(v: View?, left: Int, top: Int, right: Int, bottom: Int, oldLeft: Int, oldTop: Int, oldRight: Int, oldBottom: Int) {
         this.behavior.peekHeight = abs(bottom - top)
     }
